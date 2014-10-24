@@ -282,9 +282,9 @@ PROTOTYPES: DISABLE
 
 BOOT:
 {
-  OpenSSL_add_all_algorithms();
-
-  HV *stash = gv_stashpvn("Crypt::OpenSSL::PKCS12", 22, TRUE);
+  HV *stash;
+  char *name;
+  int i;
 
   struct { char *n; I32 v; } Crypt__OpenSSL__PKCS12__const[] = {
     {"NOKEYS", NOKEYS},
@@ -295,8 +295,9 @@ BOOT:
     {Nullch,0}
   };
 
-  char *name;
-  int i;
+  OpenSSL_add_all_algorithms();
+
+  stash = gv_stashpvn("Crypt::OpenSSL::PKCS12", 22, TRUE);
 
   for (i = 0; (name = Crypt__OpenSSL__PKCS12__const[i].n); i++) {
     newCONSTSUB(stash, name, newSViv(Crypt__OpenSSL__PKCS12__const[i].v));
@@ -342,7 +343,7 @@ new_from_string(class, string)
   /* this can come in any number of ways */
   if ((RETVAL = d2i_PKCS12_bio(bio, 0)) == NULL) {
     BIO_free_all(bio);
-    croak("%s: Couldn't create PKCS12 from d2i_PKCS12_BIO(): %s", class, ssl_error());
+    croak("%s: Couldn't create PKCS12 from d2i_PKCS12_BIO(): %s", (char*)class, ssl_error());
   }
 
   BIO_free_all(bio);
